@@ -395,7 +395,18 @@
   function formatDate(dateStr) {
     if (!dateStr) return '—';
     try {
-      const d = new Date(dateStr);
+      let d;
+      const num = Number(dateStr);
+      if (!isNaN(num) && num > 1e9 && num < 1e11) {
+        // Unix epoch seconds
+        d = new Date(num * 1000);
+      } else if (!isNaN(num) && num > 1e12) {
+        // Unix epoch milliseconds
+        d = new Date(num);
+      } else {
+        d = new Date(dateStr);
+      }
+      if (isNaN(d.getTime())) return '—';
       return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
         ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     } catch {
@@ -407,7 +418,16 @@
     if (!dateStr) return '—';
     try {
       const now = Date.now();
-      const then = new Date(dateStr).getTime();
+      const num = Number(dateStr);
+      let then;
+      if (!isNaN(num) && num > 1e9 && num < 1e11) {
+        then = num * 1000;
+      } else if (!isNaN(num) && num > 1e12) {
+        then = num;
+      } else {
+        then = new Date(dateStr).getTime();
+      }
+      if (isNaN(then)) return '—';
       const diff = now - then;
       const mins = Math.floor(diff / 60000);
       if (mins < 1) return 'just now';
