@@ -214,8 +214,7 @@ const GraphRenderer = {
       })
       .call(this._drag());
 
-    // Node labels (only for nodes with enough connections or small graphs)
-    const showLabels = this.nodes.length < 150;
+    // Node labels — always show all
     this.nodeLabels = this.g.append('g')
       .attr('class', 'node-labels')
       .selectAll('text')
@@ -223,21 +222,18 @@ const GraphRenderer = {
       .enter()
       .append('text')
       .attr('class', 'node-label')
-      .text(d => {
-        if (showLabels) return d.name.length > 24 ? d.name.slice(0, 22) + '…' : d.name;
-        return d.connections >= 3 ? (d.name.length > 18 ? d.name.slice(0, 16) + '…' : d.name) : '';
-      })
-      .attr('dy', d => radiusScale(d.connections) + 12);
+      .text(d => d.name.length > 28 ? d.name.slice(0, 26) + '…' : d.name)
+      .attr('dy', d => radiusScale(d.connections) + 14);
 
     // Force simulation
-    const chargeStrength = this.nodes.length > 200 ? -200 : this.nodes.length > 100 ? -350 : -500;
-    const linkDistance = this.nodes.length > 200 ? 80 : this.nodes.length > 100 ? 120 : 160;
+    const chargeStrength = this.nodes.length > 200 ? -400 : this.nodes.length > 100 ? -600 : -800;
+    const linkDistance = this.nodes.length > 200 ? 160 : this.nodes.length > 100 ? 220 : 280;
 
     this.simulation = d3.forceSimulation(this.nodes)
       .force('link', d3.forceLink(this.links).id(d => d.name).distance(linkDistance))
       .force('charge', d3.forceManyBody().strength(chargeStrength))
       .force('center', d3.forceCenter(this.width / 2, this.height / 2))
-      .force('collision', d3.forceCollide().radius(d => radiusScale(d.connections) + 8).strength(0.8))
+      .force('collision', d3.forceCollide().radius(d => radiusScale(d.connections) + 20).strength(0.9))
       .alphaDecay(this.nodes.length > 200 ? 0.05 : 0.02)
       .on('tick', () => this._tick(radiusScale));
 
