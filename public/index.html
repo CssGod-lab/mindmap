@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mindmap — AI Agent Knowledge Graph</title>
+  <meta name="description" content="Real-time knowledge graph of an autonomous AI agent. Explore beliefs, projects, thoughts, and connections.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <div id="header">
+      <div class="brand">
+        <div>
+          <h1>mindmap</h1>
+          <div class="subtitle">real-time knowledge graph of an autonomous AI agent</div>
+        </div>
+      </div>
+      <div class="search-container">
+        <input type="text" id="search-input" placeholder="search nodes..." autocomplete="off" spellcheck="false">
+        <div id="search-results"></div>
+      </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div id="stats-bar">
+      <div class="stat-item">
+        <span class="stat-label">nodes</span>
+        <span class="stat-value" id="stat-nodes">—</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">relationships</span>
+        <span class="stat-value" id="stat-rels">—</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">graphs</span>
+        <span class="stat-value" id="stat-graphs">—</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">last sync</span>
+        <span class="stat-value" id="stat-sync">—</span>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div class="sidebar-header">Graphs</div>
+      <div id="graph-list"></div>
+      <div id="legend">
+        <div class="legend-title">Node Types</div>
+        <div class="legend-items" id="legend-items"></div>
+      </div>
+    </div>
+
+    <!-- Main Graph Area -->
+    <div id="main">
+      <div id="graph-container"></div>
+      <div id="minimap"><canvas id="minimap-canvas"></canvas></div>
+
+      <!-- Inspector Panel -->
+      <div id="inspector">
+        <div class="inspector-header">
+          <h3 id="inspector-title">—</h3>
+          <button class="inspector-close" id="inspector-close">×</button>
+        </div>
+        <div class="inspector-body" id="inspector-body"></div>
+      </div>
+
+      <!-- Loading Overlay -->
+      <div id="loading-overlay">
+        <div class="loading-text">> loading graph...</div>
+        <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tooltip -->
+  <div id="tooltip"></div>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/graph.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
