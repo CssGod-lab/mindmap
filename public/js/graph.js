@@ -168,10 +168,10 @@ const GraphRenderer = {
       node.connections = connectionCount[node.name] || 0;
     }
 
-    // Radius based on connections
+    // Radius based on connections — big spread for visual hierarchy
     const radiusScale = d3.scaleSqrt()
       .domain([0, d3.max(this.nodes, d => d.connections) || 1])
-      .range([4, 18]);
+      .range([5, 40]);
 
     // Clear previous elements
     this.g.selectAll('*').remove();
@@ -230,14 +230,14 @@ const GraphRenderer = {
       .attr('dy', d => radiusScale(d.connections) + 12);
 
     // Force simulation
-    const chargeStrength = this.nodes.length > 200 ? -60 : this.nodes.length > 100 ? -100 : -150;
-    const linkDistance = this.nodes.length > 200 ? 40 : this.nodes.length > 100 ? 60 : 80;
+    const chargeStrength = this.nodes.length > 200 ? -200 : this.nodes.length > 100 ? -350 : -500;
+    const linkDistance = this.nodes.length > 200 ? 80 : this.nodes.length > 100 ? 120 : 160;
 
     this.simulation = d3.forceSimulation(this.nodes)
       .force('link', d3.forceLink(this.links).id(d => d.name).distance(linkDistance))
       .force('charge', d3.forceManyBody().strength(chargeStrength))
       .force('center', d3.forceCenter(this.width / 2, this.height / 2))
-      .force('collision', d3.forceCollide().radius(d => radiusScale(d.connections) + 4))
+      .force('collision', d3.forceCollide().radius(d => radiusScale(d.connections) + 8).strength(0.8))
       .alphaDecay(this.nodes.length > 200 ? 0.05 : 0.02)
       .on('tick', () => this._tick(radiusScale));
 
