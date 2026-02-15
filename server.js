@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 18804;
+const PORT = process.env.PORT || 18805;
 const SYNC_KEY = process.env.SYNC_KEY || 'mindmap-sync-key-change-me';
 
 // Ensure data directory exists

@@ -11,7 +11,7 @@
  */
 
 const LOCAL_URL = process.env.LOCAL_URL || 'http://127.0.0.1:8765';
-const REMOTE_URL = process.env.REMOTE_URL || 'http://127.0.0.1:18804';
+const REMOTE_URL = process.env.REMOTE_URL || 'http://127.0.0.1:18805';
 const SYNC_KEY = process.env.SYNC_KEY || 'mindmap-sync-key-change-me';
 
 // Prefixes to include
