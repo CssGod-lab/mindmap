@@ -238,9 +238,9 @@
     typeEl.textContent = node.type || 'Unknown';
     inspectorBody.appendChild(typeEl);
 
-    // Properties
+    // Properties — dynamic key-value rows for all fields
     const props = node.properties || {};
-    const propKeys = Object.keys(props).filter(k => !k.startsWith('_'));
+    const propKeys = Object.keys(props);
     if (propKeys.length > 0) {
       const section = createInspectorSection('Properties');
       const propsDiv = document.createElement('div');
@@ -248,15 +248,26 @@
 
       for (const key of propKeys) {
         let val = props[key];
-        if (typeof val === 'object') val = JSON.stringify(val);
-        if (typeof val === 'string' && val.length > 200) val = val.slice(0, 200) + '…';
+        if (val == null) continue;
+        if (typeof val === 'object') val = JSON.stringify(val, null, 2);
+        val = String(val);
 
         const propEl = document.createElement('div');
         propEl.className = 'inspector-prop';
-        propEl.innerHTML = `
-          <span class="prop-key">${escapeHtml(key)}</span>
-          <span class="prop-value">${escapeHtml(String(val))}</span>
-        `;
+        // Long values get full-width block display
+        const isLong = val.length > 80 || val.includes('\n');
+        if (isLong) {
+          propEl.classList.add('inspector-prop--block');
+          propEl.innerHTML = `
+            <span class="prop-key">${escapeHtml(key)}</span>
+            <span class="prop-value prop-value--block">${escapeHtml(val)}</span>
+          `;
+        } else {
+          propEl.innerHTML = `
+            <span class="prop-key">${escapeHtml(key)}</span>
+            <span class="prop-value">${escapeHtml(val)}</span>
+          `;
+        }
         propsDiv.appendChild(propEl);
       }
       section.appendChild(propsDiv);
@@ -264,20 +275,19 @@
     }
 
     // Metadata
-    if (node.created_at || node.updated_at) {
-      const metaSection = createInspectorSection('Metadata');
-      const metaDiv = document.createElement('div');
-      metaDiv.className = 'inspector-props';
-      if (node.created_at) {
-        metaDiv.innerHTML += `<div class="inspector-prop"><span class="prop-key">created</span><span class="prop-value">${escapeHtml(formatDate(node.created_at))}</span></div>`;
-      }
-      if (node.updated_at) {
-        metaDiv.innerHTML += `<div class="inspector-prop"><span class="prop-key">updated</span><span class="prop-value">${escapeHtml(formatDate(node.updated_at))}</span></div>`;
-      }
-      metaDiv.innerHTML += `<div class="inspector-prop"><span class="prop-key">connections</span><span class="prop-value">${node.connections}</span></div>`;
-      metaSection.appendChild(metaDiv);
-      inspectorBody.appendChild(metaSection);
+    const metaSection = createInspectorSection('Metadata');
+    const metaDiv = document.createElement('div');
+    metaDiv.className = 'inspector-props';
+    metaDiv.innerHTML += `<div class="inspector-prop"><span class="prop-key">graph</span><span class="prop-value">${escapeHtml(node.graph_id || currentGraphId || '—')}</span></div>`;
+    if (node.created_at) {
+      metaDiv.innerHTML += `<div class="inspector-prop"><span class="prop-key">created</span><span class="prop-value">${escapeHtml(formatDate(node.created_at))}</span></div>`;
     }
+    if (node.updated_at) {
+      metaDiv.innerHTML += `<div class="inspector-prop"><span class="prop-key">updated</span><span class="prop-value">${escapeHtml(formatDate(node.updated_at))}</span></div>`;
+    }
+    metaDiv.innerHTML += `<div class="inspector-prop"><span class="prop-key">connections</span><span class="prop-value">${node.connections != null ? node.connections : '—'}</span></div>`;
+    metaSection.appendChild(metaDiv);
+    inspectorBody.appendChild(metaSection);
 
     // Connections
     const connections = findConnections(node.name);

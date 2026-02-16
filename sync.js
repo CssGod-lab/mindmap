@@ -15,9 +15,9 @@ const REMOTE_URL = process.env.REMOTE_URL || 'http://127.0.0.1:18805';
 const SYNC_KEY = process.env.SYNC_KEY || 'mindmap-sync-key-change-me';
 
 // Prefixes to include
-const INCLUDE_PREFIXES = ['mind', 'trading', 'thought-', 'encounter-'];
+const INCLUDE_PREFIXES = ['mind', 'thought-'];
 // Prefixes to exclude (higher priority)
-const EXCLUDE_PREFIXES = ['social-'];
+const EXCLUDE_PREFIXES = ['social-', 'trading', 'encounter-'];
 
 function shouldSync(graphId) {
   // Check exclusions first

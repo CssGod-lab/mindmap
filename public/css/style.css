@@ -94,8 +94,7 @@ html, body {
 }
 
 .brand h1::before {
-  content: '> ';
-  color: var(--text-muted);
+  content: '';
 }
 
 .brand .subtitle {
@@ -431,6 +430,22 @@ html, body {
 
 .inspector-prop .prop-value {
   color: var(--text);
+}
+
+.inspector-prop--block {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inspector-prop--block .prop-value--block {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+  font-size: 11px;
 }
 
 .inspector-connection {

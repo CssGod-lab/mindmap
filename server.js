@@ -253,30 +253,53 @@ app.post('/api/sync', (req, res) => {
       db.prepare('DELETE FROM nodes WHERE graph_id = ?').run(id);
       db.prepare('DELETE FROM relationships WHERE graph_id = ?').run(id);
 
-      // Insert nodes
+      // Insert nodes (deduplicate by name within graph)
+      // Collect ALL fields beyond the structural ones into properties
+      const STRUCTURAL_KEYS = new Set(['id', 'name', 'type', 'properties', 'created_at', 'updated_at']);
       const insertNode = db.prepare(
-        'INSERT INTO nodes (id, graph_id, name, type, properties, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        'INSERT OR REPLACE INTO nodes (id, graph_id, name, type, properties, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
       );
+      const seenNodeNames = new Set();
       for (const node of nodeList) {
-        const nodeId = String(node.id || node.name || Math.random().toString(36).slice(2));
-        const props = typeof node.properties === 'string' ? node.properties : JSON.stringify(node.properties || {});
+        const nodeName = node.name || '';
+        const nodeId = nodeName || String(node.id || Math.random().toString(36).slice(2));
+        if (nodeName && seenNodeNames.has(nodeName)) continue;
+        if (nodeName) seenNodeNames.add(nodeName);
+
+        // Merge explicit properties with all extra top-level fields
+        const extraProps = {};
+        for (const [k, v] of Object.entries(node)) {
+          if (!STRUCTURAL_KEYS.has(k)) extraProps[k] = v;
+        }
+        const baseProps = typeof node.properties === 'string'
+          ? JSON.parse(node.properties || '{}')
+          : (node.properties || {});
+        const mergedProps = { ...baseProps, ...extraProps };
+        // Remove _created/_updated from props since they have dedicated columns
+        delete mergedProps._created;
+        delete mergedProps._updated;
+
         insertNode.run(
           nodeId,
           id,
-          node.name || '',
+          nodeName,
           node.type || 'Unknown',
-          props,
+          JSON.stringify(mergedProps),
           node.created_at || node._created || now,
           node.updated_at || node._updated || now
         );
       }
 
-      // Insert relationships
+      // Insert relationships (deduplicate by source-type-target)
       const insertRel = db.prepare(
-        'INSERT INTO relationships (id, graph_id, source, target, type, properties, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        'INSERT OR REPLACE INTO relationships (id, graph_id, source, target, type, properties, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
       );
+      const seenRels = new Set();
       for (const rel of relList) {
-        const relId = String(rel.id || `${rel.source}-${rel.type}-${rel.target}-${Math.random().toString(36).slice(2)}`);
+        const relKey = `${rel.source || ''}-${rel.type || 'RELATES_TO'}-${rel.target || ''}`;
+        if (seenRels.has(relKey)) continue;
+        seenRels.add(relKey);
+        const relId = relKey;
         const props = typeof rel.properties === 'string' ? rel.properties : JSON.stringify(rel.properties || {});
         insertRel.run(
           relId,
