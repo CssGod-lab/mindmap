@@ -44,7 +44,7 @@
     });
 
     // Load default graph
-    const defaultGraph = 'mind';
+    const defaultGraph = 'master';
     const hasDefault = graphsList.some(g => g.id === defaultGraph);
     if (hasDefault) {
       loadGraph(defaultGraph);

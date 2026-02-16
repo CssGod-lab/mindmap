@@ -338,6 +338,21 @@ app.post('/api/sync', (req, res) => {
   }
 });
 
+// Delete a graph (protected)
+app.delete('/api/graph/:id', (req, res) => {
+  const key = req.headers['x-sync-key'];
+  if (key !== SYNC_KEY) return res.status(403).json({ error: 'Invalid sync key' });
+  try {
+    const id = req.params.id;
+    db.prepare('DELETE FROM nodes WHERE graph_id = ?').run(id);
+    db.prepare('DELETE FROM relationships WHERE graph_id = ?').run(id);
+    db.prepare('DELETE FROM graphs WHERE id = ?').run(id);
+    res.json({ ok: true, deleted: id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // SPA fallback - serve index.html for non-API routes
 app.get('*', (req, res) => {
   if (!req.path.startsWith('/api/')) {

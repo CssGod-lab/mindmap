@@ -34,6 +34,8 @@ const NODE_COLORS = {
   Evidence: '#38bdf8',
   Counterpoint: '#f87171',
   Identity: '#4ade80',
+  Graph: '#06b6d4',
+  Portal: '#f59e0b',
   Status: '#94a3b8',
   Reference: '#cbd5e1',
   Unknown: '#888888'
